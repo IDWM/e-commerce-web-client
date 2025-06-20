@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -e  # Exit on any error
+echo "🚀 Pre-commit checks starting..."
+
+# 1. Prettier formatting
+echo "🟡 [1/3] Code formatting with Prettier..."
+if npx prettier --write .; then
+    echo "🟢 Formatting completed successfully"
+else
+    echo "🔴 Formatting failed"
+    exit 1
+fi
+
+# 2. ESLint fixing
+echo "🟡 [2/3] Linting and auto-fixing with ESLint..."
+if npx eslint --fix .; then
+    echo "🟢 Linting completed successfully"
+else
+    echo "🔴 Linting failed"
+    exit 1
+fi
+
+# 3. TypeScript type checking
+echo "🟡 [3/3] Type checking with TypeScript..."
+if npx tsc --noEmit --skipLibCheck; then
+    echo "🟢 Type checking passed"
+else
+    echo "🔴 Type checking failed"
+    exit 1
+fi
+
+echo "✅ All pre-commit checks passed"

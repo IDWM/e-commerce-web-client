@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e  # Exit on any error
+echo "🚀 Pre-push checks starting..."
+
+# 1. Knip unused files/exports scan
+echo "🟡 [1/2] Scanning for unused files/exports with Knip..."
+if npx knip --no-progress; then
+    echo "🟢 Knip scan completed - no unused code found"
+else
+    echo "🔴 Knip found unused files or exports"
+    exit 1
+fi
+
+# 2. Production build verification
+echo "🟡 [2/2] Running production build verification..."
+if npm run build --if-present; then
+    echo "🟢 Production build completed successfully"
+else
+    echo "🔴 Production build failed"
+    exit 1
+fi
+
+echo "✅ All pre-push checks passed"
