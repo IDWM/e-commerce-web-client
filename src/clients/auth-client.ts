@@ -1,4 +1,4 @@
-import { apiClient } from './axios-client';
+import { apiClient } from '@/clients';
 
 import type { LoginRequest, LoginResponse } from '@/models';
 

@@ -2,8 +2,7 @@ import { ReactNode } from 'react';
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import { Footer, Navbar } from '@/components';
-
-import { Providers } from './providers';
+import { Providers } from '@/providers';
 
 import type { Metadata } from 'next';
 
