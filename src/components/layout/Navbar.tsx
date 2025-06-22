@@ -1,13 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { LogOut } from 'lucide-react';
 
 import { Button } from '@/components';
+import { useLogout } from '@/hooks';
 
 export const Navbar = () => {
   const { data: session, status } = useSession();
+  const logoutMutation = useLogout();
 
   return (
     <header className='sticky top-0 z-10 h-16 w-full border-b flex justify-center items-center bg-white'>
@@ -23,7 +25,7 @@ export const Navbar = () => {
               <Button
                 variant='ghost'
                 size='sm'
-                onClick={() => signOut()}
+                onClick={() => logoutMutation.mutate()}
                 className='flex items-center space-x-1 cursor-pointer'
               >
                 <LogOut className='h-4 w-4' />

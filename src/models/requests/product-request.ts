@@ -7,7 +7,7 @@ const baseProductFiltersSchema = z.object({
   orderBy: z.string().optional(),
 });
 
-export const productParamsSchema = baseProductFiltersSchema.extend({
+const _productParamsSchema = baseProductFiltersSchema.extend({
   pageNumber: z.number().min(1).default(1),
   pageSize: z.number().min(1).max(100).default(12),
   brands: z.string().optional(),
@@ -15,7 +15,7 @@ export const productParamsSchema = baseProductFiltersSchema.extend({
   condition: z.number().optional(),
 });
 
-export type ProductParamsRequest = z.infer<typeof productParamsSchema>;
+export type ProductParamsRequest = z.infer<typeof _productParamsSchema>;
 
 export const productFiltersSchema = baseProductFiltersSchema.extend({
   brands: z.array(z.string()).optional(),

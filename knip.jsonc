@@ -1,5 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema-jsonc.json",
-  "ignore": ["eslint.config.mjs"],
-  "ignoreDependencies": ["@eslint/eslintrc", "eslint-plugin-react-hooks", "postcss"],
+  "ignore": ["eslint.config.mjs", "src/components/ui/**/*.{ts,tsx}"],
+  "ignoreDependencies": ["postcss", "tailwindcss", "tw-animate-css", "eslint-config-next"],
+  "ignoreExportsUsedInFile": true,
 }
