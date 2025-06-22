@@ -60,12 +60,6 @@ export const Pagination = ({ pagination, onPageChange, onPageSizeChange }: Pagin
               <SelectItem value='12' className='cursor-pointer'>
                 12
               </SelectItem>
-              <SelectItem value='24' className='cursor-pointer'>
-                24
-              </SelectItem>
-              <SelectItem value='48' className='cursor-pointer'>
-                48
-              </SelectItem>
             </SelectContent>
           </Select>
         </div>
