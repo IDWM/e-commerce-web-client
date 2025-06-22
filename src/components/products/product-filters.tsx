@@ -147,7 +147,7 @@ export const ProductFilters = ({
             <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
             <Input
               id='search'
-              placeholder='Buscar por nombre o descripción... (Enter para buscar)'
+              placeholder='Buscar por nombre o descripción...'
               className='pl-10'
               onKeyDown={handleSearchKeyDown}
               {...form.register('search')}
@@ -162,12 +162,12 @@ export const ProductFilters = ({
             control={form.control}
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
+                <SelectTrigger className='cursor-pointer'>
                   <SelectValue placeholder='Seleccionar orden' />
                 </SelectTrigger>
                 <SelectContent>
                   {sortBy.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
+                    <SelectItem key={option.value} value={option.value} className='cursor-pointer'>
                       {option.label}
                     </SelectItem>
                   ))}
@@ -187,7 +187,7 @@ export const ProductFilters = ({
               min={minPrice}
               max={maxPrice}
               step={1}
-              className='w-full'
+              className='w-full cursor-pointer'
             />
             <div className='flex justify-between text-xs text-muted-foreground mt-1'>
               <span>${minPrice.toLocaleString()}</span>
@@ -216,10 +216,6 @@ export const ProductFilters = ({
                 onChange={(e) => handlePriceInputChange('maxPrice', e.target.value)}
               />
             </div>
-          </div>
-
-          <div className='text-center text-sm text-muted-foreground'>
-            ${priceRange[0].toLocaleString()} - ${priceRange[1].toLocaleString()}
           </div>
         </div>
 
@@ -329,7 +325,7 @@ export const ProductFilters = ({
                 className='space-y-2'
               >
                 <div className='flex items-center space-x-2'>
-                  <RadioGroupItem value='all' id='condition-all' />
+                  <RadioGroupItem className='cursor-pointer' value='all' id='condition-all' />
                   <Label htmlFor='condition-all' className='text-sm cursor-pointer'>
                     Todos
                   </Label>
@@ -339,7 +335,11 @@ export const ProductFilters = ({
                   .filter(([_, value]) => typeof value === 'number')
                   .map(([key, value]) => (
                     <div key={key} className='flex items-center space-x-2'>
-                      <RadioGroupItem value={value.toString()} id={`condition-${key}`} />
+                      <RadioGroupItem
+                        className='cursor-pointer'
+                        value={value.toString()}
+                        id={`condition-${key}`}
+                      />
                       <Label htmlFor={`condition-${key}`} className='text-sm cursor-pointer'>
                         {conditionLabels[value as ProductCondition] || key}
                       </Label>
@@ -351,10 +351,10 @@ export const ProductFilters = ({
         </div>
 
         <div className='flex gap-2 pt-4'>
-          <Button type='submit' className='flex-1' onClick={onSubmit}>
+          <Button type='submit' className='flex-1 cursor-pointer' onClick={onSubmit}>
             Aplicar filtros
           </Button>
-          <Button type='button' variant='outline' onClick={onClear}>
+          <Button type='button' className='cursor-pointer' variant='outline' onClick={onClear}>
             <X className='h-4 w-4' />
           </Button>
         </div>

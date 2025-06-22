@@ -29,6 +29,7 @@ export const VirtualizedList = ({
           id={`${idPrefix}-${item}`}
           checked={selectedItems.includes(item)}
           onCheckedChange={() => onToggleItem(item)}
+          className='cursor-pointer'
         />
         <Label htmlFor={`${idPrefix}-${item}`} className='text-sm cursor-pointer flex-1'>
           {item}

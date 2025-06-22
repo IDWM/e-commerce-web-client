@@ -50,14 +50,22 @@ export const Pagination = ({ pagination, onPageChange, onPageSizeChange }: Pagin
             value={pageSize.toString()}
             onValueChange={(value) => onPageSizeChange(Number(value))}
           >
-            <SelectTrigger className='w-20'>
+            <SelectTrigger className='w-20 cursor-pointer'>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='6'>6</SelectItem>
-              <SelectItem value='12'>12</SelectItem>
-              <SelectItem value='24'>24</SelectItem>
-              <SelectItem value='48'>48</SelectItem>
+              <SelectItem value='6' className='cursor-pointer'>
+                6
+              </SelectItem>
+              <SelectItem value='12' className='cursor-pointer'>
+                12
+              </SelectItem>
+              <SelectItem value='24' className='cursor-pointer'>
+                24
+              </SelectItem>
+              <SelectItem value='48' className='cursor-pointer'>
+                48
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -69,6 +77,7 @@ export const Pagination = ({ pagination, onPageChange, onPageSizeChange }: Pagin
           size='sm'
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
+          className='cursor-pointer'
         >
           <ChevronLeft className='h-4 w-4' />
           <span className='sr-only'>Página anterior</span>
@@ -77,7 +86,12 @@ export const Pagination = ({ pagination, onPageChange, onPageSizeChange }: Pagin
         <div className='flex items-center gap-1'>
           {currentPage > 3 && (
             <>
-              <Button variant='outline' size='sm' onClick={() => onPageChange(1)} className='w-10'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => onPageChange(1)}
+                className='w-10 cursor-pointer'
+              >
                 1
               </Button>
               {currentPage > 4 && <span className='px-2'>...</span>}
@@ -90,7 +104,7 @@ export const Pagination = ({ pagination, onPageChange, onPageSizeChange }: Pagin
               variant={page === currentPage ? 'default' : 'outline'}
               size='sm'
               onClick={() => onPageChange(page)}
-              className='w-10'
+              className='w-10 cursor-pointer'
             >
               {page}
             </Button>
@@ -103,7 +117,7 @@ export const Pagination = ({ pagination, onPageChange, onPageSizeChange }: Pagin
                 variant='outline'
                 size='sm'
                 onClick={() => onPageChange(totalPages)}
-                className='w-10'
+                className='w-10 cursor-pointer'
               >
                 {totalPages}
               </Button>
@@ -116,6 +130,7 @@ export const Pagination = ({ pagination, onPageChange, onPageSizeChange }: Pagin
           size='sm'
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
+          className='cursor-pointer'
         >
           <ChevronRight className='h-4 w-4' />
           <span className='sr-only'>Página siguiente</span>
