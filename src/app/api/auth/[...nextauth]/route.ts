@@ -2,8 +2,8 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
 import { authClient } from '@/clients';
+import { LoginRequest } from '@/models';
 
-import type { LoginRequest } from '@/models';
 import type { NextAuthOptions } from 'next-auth';
 
 const authConfig: NextAuthOptions = {

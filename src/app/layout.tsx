@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import { Footer, Navbar } from '@/components';
-import { Providers } from '@/providers';
+import { AppProviders } from '@/providers';
 
 import type { Metadata } from 'next';
 
@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'E-commerce App',
-  description: 'Modern e-commerce application',
+  title: 'E-Commerce App',
+  description: 'Tu E-Commerce de confianza',
 };
 
 export default function RootLayout({
@@ -30,14 +30,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='es'>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
-      >
-        <Providers>
-          <Navbar />
-          <main className='flex-grow'>{children}</main>
-          <Footer />
-        </Providers>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <AppProviders>
+          <div className='flex flex-col min-h-screen'>
+            <Navbar />
+            <main className='flex-1 py-10'>{children}</main>
+            <Footer />
+          </div>
+        </AppProviders>
       </body>
     </html>
   );
