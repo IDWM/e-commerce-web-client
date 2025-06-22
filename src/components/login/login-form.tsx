@@ -6,13 +6,11 @@ import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button, Input, Label } from '@/components';
 import { useLogin } from '@/hooks';
-import { type LoginRequest, loginSchema } from '@/models';
+import { LoginRequest, loginSchema } from '@/models';
 
-export function LoginForm() {
+export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const loginMutation = useLogin();
 
@@ -89,4 +87,4 @@ export function LoginForm() {
       </div>
     </div>
   );
-}
+};
