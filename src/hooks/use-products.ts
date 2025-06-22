@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
