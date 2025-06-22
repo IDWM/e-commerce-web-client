@@ -1,10 +1,6 @@
-import { ApiResponse } from '@/models';
-
-export interface AuthResponse {
+export interface LoginResponse {
   firtsName: string;
   lastName: string;
   email: string;
   token: string;
 }
-
-export type LoginResponse = ApiResponse<AuthResponse>;
