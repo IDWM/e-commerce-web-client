@@ -1,4 +1,5 @@
 export * from './common/pagination';
+export * from './common/pagination-skeleton';
 export * from './layout/footer';
 export * from './layout/navbar';
 export * from './login/login-form';

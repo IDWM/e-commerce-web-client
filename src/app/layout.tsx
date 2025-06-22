@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'E-Commerce App',
+  title: 'E-Commerce',
   description: 'Tu E-Commerce de confianza',
 };
 

@@ -1,14 +1,8 @@
 'use client';
 
-import {
-  NoProducts,
-  Pagination,
-  ProductCard,
-  ProductCardSkeleton,
-  ProductFilters,
-  ProductFiltersSkeleton,
-} from '@/components';
+import { NoProducts, Pagination, ProductCard, ProductFilters } from '@/components';
 import { useProducts } from '@/hooks';
+import { ProductsSkeletonView } from '@/views';
 
 export const ProductsView = () => {
   const {
@@ -27,28 +21,7 @@ export const ProductsView = () => {
   } = useProducts();
 
   if (isLoading) {
-    return (
-      <div className='container mx-auto'>
-        <div className='space-y-8'>
-          <div className='space-y-2'>
-            <div className='h-9 bg-gray-300 rounded w-48 animate-pulse'></div>
-            <div className='h-5 bg-gray-200 rounded w-96 animate-pulse'></div>
-          </div>
-          <div className='grid grid-cols-4 gap-8'>
-            <div className='col-span-1'>
-              <ProductFiltersSkeleton />
-            </div>
-            <div className='col-span-3'>
-              <div className='grid grid-cols-4 gap-6'>
-                {Array.from({ length: 12 }).map((_, index) => (
-                  <ProductCardSkeleton key={index} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <ProductsSkeletonView />;
   }
 
   if (isError) {
@@ -67,11 +40,6 @@ export const ProductsView = () => {
   return (
     <div className='container mx-auto'>
       <div className='space-y-8'>
-        <div className='space-y-2'>
-          <h1 className='text-3xl font-bold'>Productos</h1>
-          <p className='text-muted-foreground'>Encuentra los mejores productos al mejor precio</p>
-        </div>
-
         <div className='grid grid-cols-4 gap-8'>
           <div className='col-span-1'>
             <ProductFilters
@@ -87,7 +55,14 @@ export const ProductsView = () => {
           </div>
 
           <div className='col-span-3'>
-            <div className='space-y-6'>
+            <div className='space-y-2'>
+              <div className='space-y-2'>
+                <h1 className='text-3xl font-bold'>Productos</h1>
+                <p className='text-muted-foreground'>
+                  Encuentra los mejores productos al mejor precio
+                </p>
+              </div>
+
               <Pagination
                 pagination={pagination}
                 onPageChange={setPage}

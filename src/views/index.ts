@@ -1,2 +1,2 @@
-export * from './products-fallback-view';
+export * from './products-skeleton-view';
 export * from './products-view';
