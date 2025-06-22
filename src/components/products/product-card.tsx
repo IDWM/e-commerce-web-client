@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { Badge, Button } from '@/components';
 import { formatPrice } from '@/libs';
@@ -20,7 +21,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <div className='bg-card rounded-lg border p-4 transition-shadow'>
+    <Link
+      href={`/products/${product.id}`}
+      className='bg-card rounded-lg border p-4 transition-transform duration-200 hover:scale-101 hover:shadow-lg flex flex-col h-full'
+    >
       <div className='aspect-square relative mb-4 overflow-hidden rounded-md bg-muted'>
         <Image
           src='https://cdn-icons-png.flaticon.com/512/9402/9402212.png'
@@ -31,30 +35,30 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         />
       </div>
 
-      <div className='space-y-2'>
+      <div className='flex flex-col flex-1 space-y-2'>
         <div className='flex items-start justify-between'>
           <h3 className='font-semibold text-sm line-clamp-2'>{product.name}</h3>
           <Badge variant='secondary' className={getConditionColor(product.condition)}>
             {getConditionLabel(product.condition)}
           </Badge>
         </div>
-
         <p className='text-xs text-muted-foreground line-clamp-2'>{product.description}</p>
-
         <div className='flex items-center justify-between text-xs text-muted-foreground'>
           <span>{product.brand}</span>
           <span>{product.category}</span>
         </div>
-
         <div className='flex items-center justify-between'>
           <span className='font-bold text-lg'>{formatPrice(product.price)}</span>
           <span className='text-xs text-muted-foreground'>Stock: {product.stock}</span>
         </div>
-
-        <Button className='w-full' disabled={product.stock === 0 || !product.isActive}>
+        <div className='flex-1' />
+        <Button
+          className='w-full cursor-pointer'
+          disabled={product.stock === 0 || !product.isActive}
+        >
           {product.stock === 0 ? 'Sin stock' : 'Agregar al carrito'}
         </Button>
       </div>
-    </div>
+    </Link>
   );
 };
