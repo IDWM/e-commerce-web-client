@@ -1,11 +1,17 @@
-import { ProductFiltersForm, ProductParamsRequest } from '@/models';
+import { ProductCondition, ProductFiltersForm, ProductParamsRequest } from '@/models';
+
+const conditionLabels = ['all', 'new', 'old'];
+const conditionValues = [undefined, ProductCondition.NEW, ProductCondition.OLD];
 
 export const convertFormToParams = (form: ProductFiltersForm): Partial<ProductParamsRequest> => {
   return {
     search: form.search || undefined,
     brands: form.brands?.length ? form.brands.join(',') : undefined,
     categories: form.categories?.length ? form.categories.join(',') : undefined,
-    condition: form.condition,
+    condition:
+      form.condition !== undefined && form.condition > 0
+        ? conditionValues[form.condition]
+        : undefined,
     minPrice: form.minPrice,
     maxPrice: form.maxPrice,
     orderBy: form.orderBy && form.orderBy !== 'default' ? form.orderBy : undefined,
@@ -13,11 +19,17 @@ export const convertFormToParams = (form: ProductFiltersForm): Partial<ProductPa
 };
 
 export const convertParamsToForm = (params: ProductParamsRequest): ProductFiltersForm => {
+  let conditionIndex = 0;
+  if (params.condition !== undefined) {
+    conditionIndex = conditionValues.findIndex((val) => val === params.condition);
+    if (conditionIndex === -1) conditionIndex = 0;
+  }
+
   return {
     search: params.search || '',
     brands: params.brands?.split(',').filter(Boolean) || [],
     categories: params.categories?.split(',').filter(Boolean) || [],
-    condition: params.condition,
+    condition: conditionIndex,
     minPrice: params.minPrice,
     maxPrice: params.maxPrice,
     orderBy: params.orderBy || 'default',
@@ -25,11 +37,16 @@ export const convertParamsToForm = (params: ProductParamsRequest): ProductFilter
 };
 
 const convertUrlParamValue = (key: string, value: string): string | number | undefined => {
-  const numericKeys = ['pageNumber', 'pageSize', 'minPrice', 'maxPrice', 'condition'];
+  const numericKeys = ['pageNumber', 'pageSize', 'minPrice', 'maxPrice'];
 
   if (numericKeys.includes(key)) {
     const numValue = Number(value);
     return isNaN(numValue) ? undefined : numValue;
+  }
+
+  if (key === 'condition') {
+    const conditionIndex = conditionLabels.findIndex((label) => label === value);
+    return conditionIndex >= 0 ? conditionIndex : 0;
   }
 
   return value;
@@ -85,7 +102,7 @@ export const convertUrlToParams = (
           break;
         case 'condition':
           if (typeof convertedValue === 'number') {
-            urlFilters.condition = convertedValue;
+            urlFilters.condition = conditionValues[convertedValue];
           }
           break;
         case 'search':
@@ -113,4 +130,26 @@ export const convertUrlToParams = (
   });
 
   return urlFilters;
+};
+
+export const convertParamsToUrl = (params: ProductParamsRequest): URLSearchParams => {
+  const urlParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      if (key === 'pageNumber' && value === 1) return;
+      if (key === 'pageSize' && value === 12) return;
+
+      if (key === 'condition') {
+        const conditionIndex = conditionValues.findIndex((val) => val === value);
+        if (conditionIndex > 0) {
+          urlParams.set(key, conditionLabels[conditionIndex]);
+        }
+      } else {
+        urlParams.set(key, value.toString());
+      }
+    }
+  });
+
+  return urlParams;
 };

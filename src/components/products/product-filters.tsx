@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { KeyboardEvent, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ChevronDown, ChevronUp, Filter, Search, X } from 'lucide-react';
 
@@ -18,7 +18,8 @@ import {
   Slider,
   VirtualizedList,
 } from '@/components';
-import { ProductCondition, ProductFiltersForm } from '@/models';
+import { formatPrice } from '@/libs';
+import { ProductFiltersForm } from '@/models';
 
 const sortBy = [
   { value: 'default', label: 'Sin orden' },
@@ -29,10 +30,11 @@ const sortBy = [
   { value: 'newest', label: 'Más recientes' },
 ];
 
-const conditionLabels = {
-  [ProductCondition.NEW]: 'Nuevo',
-  [ProductCondition.OLD]: 'Usado',
-};
+const conditionOptions = [
+  { value: 0, label: 'Todos' },
+  { value: 1, label: 'Nuevo' },
+  { value: 2, label: 'Usado' },
+];
 
 interface ProductFiltersProps {
   form: ReturnType<typeof useForm<ProductFiltersForm>>;
@@ -55,11 +57,17 @@ export const ProductFilters = ({
   minPrice = 0,
   maxPrice = 10000,
 }: ProductFiltersProps) => {
+  const roundedMinPrice = Math.floor(minPrice / 1000) * 1000;
+  const roundedMaxPrice = Math.ceil(maxPrice / 1000) * 1000;
+
   const [brandSearch, setBrandSearch] = useState('');
   const [categorySearch, setCategorySearch] = useState('');
   const [brandExpanded, setBrandExpanded] = useState(false);
   const [categoryExpanded, setCategoryExpanded] = useState(false);
-  const [priceRange, setPriceRange] = useState<[number, number]>([minPrice, maxPrice]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([
+    roundedMinPrice,
+    roundedMaxPrice,
+  ]);
 
   const selectedBrands = form.watch('brands') || [];
   const selectedCategories = form.watch('categories') || [];
@@ -67,15 +75,15 @@ export const ProductFilters = ({
   const currentMaxPrice = form.watch('maxPrice');
 
   useEffect(() => {
-    const min = currentMinPrice ?? minPrice;
-    const max = currentMaxPrice ?? maxPrice;
+    const min = currentMinPrice ?? roundedMinPrice;
+    const max = currentMaxPrice ?? roundedMaxPrice;
     setPriceRange([min, max]);
-  }, [currentMinPrice, currentMaxPrice, minPrice, maxPrice]);
+  }, [currentMinPrice, currentMaxPrice, roundedMinPrice, roundedMaxPrice]);
 
   const handlePriceRangeChange = (newRange: [number, number]) => {
     setPriceRange(newRange);
-    form.setValue('minPrice', newRange[0] === minPrice ? undefined : newRange[0]);
-    form.setValue('maxPrice', newRange[1] === maxPrice ? undefined : newRange[1]);
+    form.setValue('minPrice', newRange[0] === roundedMinPrice ? undefined : newRange[0]);
+    form.setValue('maxPrice', newRange[1] === roundedMaxPrice ? undefined : newRange[1]);
   };
 
   const handleBrandToggle = (brand: string) => {
@@ -102,32 +110,10 @@ export const ProductFilters = ({
     }
   };
 
-  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleSearchKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       onSearchSubmit();
-    }
-  };
-
-  const handlePriceInputChange = (field: 'minPrice' | 'maxPrice', value: string) => {
-    const numValue = value === '' ? undefined : Number(value);
-
-    if (field === 'minPrice') {
-      const newMin = numValue ?? minPrice;
-      const currentMax = currentMaxPrice ?? maxPrice;
-
-      if (newMin <= currentMax) {
-        setPriceRange([newMin, currentMax]);
-        form.setValue('minPrice', numValue);
-      }
-    } else {
-      const currentMin = currentMinPrice ?? minPrice;
-      const newMax = numValue ?? maxPrice;
-
-      if (newMax >= currentMin) {
-        setPriceRange([currentMin, newMax]);
-        form.setValue('maxPrice', numValue);
-      }
     }
   };
 
@@ -142,12 +128,12 @@ export const ProductFilters = ({
 
       <div className='p-4 space-y-4'>
         <div className='space-y-2'>
-          <Label htmlFor='search'>Buscar productos</Label>
+          <Label htmlFor='search'>Buscar por nombre o descripción</Label>
           <div className='relative'>
             <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
             <Input
               id='search'
-              placeholder='Buscar por nombre o descripción...'
+              placeholder='Buscar...'
               className='pl-10'
               onKeyDown={handleSearchKeyDown}
               {...form.register('search')}
@@ -184,38 +170,20 @@ export const ProductFilters = ({
             <Slider
               value={priceRange}
               onValueChange={handlePriceRangeChange}
-              min={minPrice}
-              max={maxPrice}
+              min={roundedMinPrice}
+              max={roundedMaxPrice}
               step={1}
               className='w-full cursor-pointer'
             />
             <div className='flex justify-between text-xs text-muted-foreground mt-1'>
-              <span>${minPrice.toLocaleString()}</span>
-              <span>${maxPrice.toLocaleString()}</span>
+              <span>{formatPrice(roundedMinPrice)}</span>
+              <span>{formatPrice(roundedMaxPrice)}</span>
             </div>
           </div>
 
-          <div className='flex gap-2'>
-            <div className='flex-1'>
-              <Input
-                type='number'
-                placeholder={`Mín. ${minPrice}`}
-                min={minPrice}
-                max={maxPrice}
-                value={currentMinPrice ?? ''}
-                onChange={(e) => handlePriceInputChange('minPrice', e.target.value)}
-              />
-            </div>
-            <div className='flex-1'>
-              <Input
-                type='number'
-                placeholder={`Máx. ${maxPrice}`}
-                min={minPrice}
-                max={maxPrice}
-                value={currentMaxPrice ?? ''}
-                onChange={(e) => handlePriceInputChange('maxPrice', e.target.value)}
-              />
-            </div>
+          <div className='flex justify-between items-center bg-muted/50 font-light px-3 py-2 rounded'>
+            <p>{formatPrice(currentMinPrice ?? roundedMinPrice)}</p>
+            <p>{formatPrice(currentMaxPrice ?? roundedMaxPrice)}</p>
           </div>
         </div>
 
@@ -224,7 +192,7 @@ export const ProductFilters = ({
             <button
               type='button'
               onClick={() => setBrandExpanded(!brandExpanded)}
-              className='w-full flex items-center justify-between p-2 text-left hover:bg-muted/50 rounded'
+              className='w-full flex items-center justify-between p-2 text-left hover:bg-muted/50 rounded cursor-pointer'
             >
               <Label className='cursor-pointer'>
                 Marcas ({availableBrands.length})
@@ -270,7 +238,7 @@ export const ProductFilters = ({
             <button
               type='button'
               onClick={() => setCategoryExpanded(!categoryExpanded)}
-              className='w-full flex items-center justify-between p-2 text-left hover:bg-muted/50 rounded'
+              className='w-full flex items-center justify-between p-2 text-left hover:bg-muted/50 rounded cursor-pointer'
             >
               <Label className='cursor-pointer'>
                 Categorías ({availableCategories.length})
@@ -318,33 +286,24 @@ export const ProductFilters = ({
             control={form.control}
             render={({ field }) => (
               <RadioGroup
-                value={field.value !== undefined ? field.value.toString() : 'all'}
+                value={(field.value ?? 0).toString()}
                 onValueChange={(value) => {
-                  field.onChange(value === 'all' ? undefined : Number(value));
+                  field.onChange(Number(value));
                 }}
                 className='space-y-2'
               >
-                <div className='flex items-center space-x-2'>
-                  <RadioGroupItem className='cursor-pointer' value='all' id='condition-all' />
-                  <Label htmlFor='condition-all' className='text-sm cursor-pointer'>
-                    Todos
-                  </Label>
-                </div>
-
-                {Object.entries(ProductCondition)
-                  .filter(([_, value]) => typeof value === 'number')
-                  .map(([key, value]) => (
-                    <div key={key} className='flex items-center space-x-2'>
-                      <RadioGroupItem
-                        className='cursor-pointer'
-                        value={value.toString()}
-                        id={`condition-${key}`}
-                      />
-                      <Label htmlFor={`condition-${key}`} className='text-sm cursor-pointer'>
-                        {conditionLabels[value as ProductCondition] || key}
-                      </Label>
-                    </div>
-                  ))}
+                {conditionOptions.map((option) => (
+                  <div key={option.value} className='flex items-center space-x-2'>
+                    <RadioGroupItem
+                      className='cursor-pointer'
+                      value={option.value.toString()}
+                      id={`condition-${option.value}`}
+                    />
+                    <Label htmlFor={`condition-${option.value}`} className='text-sm cursor-pointer'>
+                      {option.label}
+                    </Label>
+                  </div>
+                ))}
               </RadioGroup>
             )}
           />

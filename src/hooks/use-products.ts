@@ -5,7 +5,12 @@ import { useForm } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { convertFormToParams, convertParamsToForm, convertUrlToParams } from '@/libs';
+import {
+  convertFormToParams,
+  convertParamsToForm,
+  convertParamsToUrl,
+  convertUrlToParams,
+} from '@/libs';
 import { ProductFiltersForm, productFiltersSchema, ProductParamsRequest } from '@/models';
 import { useGetProductFilters, useGetProducts } from '@/services';
 import { useProductStore } from '@/stores';
@@ -13,9 +18,7 @@ import { useProductStore } from '@/stores';
 export const useProducts = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  const initializedFromUrl = useRef(false);
-  const isUpdatingUrl = useRef(false);
+  const isInitialized = useRef(false);
 
   const {
     products,
@@ -34,51 +37,43 @@ export const useProducts = () => {
   const productsQuery = useGetProducts(filters);
   const productFiltersQuery = useGetProductFilters();
 
+  const initialValues = convertParamsToForm(
+    Object.keys(convertUrlToParams(searchParams)).length > 0
+      ? { ...filters, ...convertUrlToParams(searchParams) }
+      : filters,
+  );
+
+  if (initialValues.condition === undefined) {
+    initialValues.condition = 0;
+  }
+
   const form = useForm<ProductFiltersForm>({
     resolver: zodResolver(productFiltersSchema),
-    defaultValues: convertParamsToForm(filters),
+    defaultValues: initialValues,
   });
+
+  useEffect(() => {
+    if (!isInitialized.current) {
+      const urlFilters = convertUrlToParams(searchParams);
+      if (Object.keys(urlFilters).length > 0) {
+        initializeFromUrl(urlFilters);
+      }
+      isInitialized.current = true;
+    }
+  }, [searchParams, initializeFromUrl]);
 
   const updateUrl = useCallback(
     (filters: ProductParamsRequest) => {
-      if (isUpdatingUrl.current) {
-        return;
-      }
-
-      const params = new URLSearchParams();
-
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          if (key === 'pageNumber' && value === 1) return;
-          if (key === 'pageSize' && value === 12) return;
-          params.set(key, value.toString());
-        }
-      });
-
+      const params = convertParamsToUrl(filters);
       const queryString = params.toString();
       const newUrl = queryString ? `?${queryString}` : window.location.pathname;
-
       router.replace(newUrl, { scroll: false });
     },
     [router],
   );
 
   useEffect(() => {
-    if (!initializedFromUrl.current) {
-      isUpdatingUrl.current = true;
-
-      const urlFilters = convertUrlToParams(searchParams);
-      if (Object.keys(urlFilters).length > 0) {
-        initializeFromUrl(urlFilters);
-      }
-
-      initializedFromUrl.current = true;
-      isUpdatingUrl.current = false;
-    }
-  });
-
-  useEffect(() => {
-    if (initializedFromUrl.current && !isUpdatingUrl.current) {
+    if (isInitialized.current) {
       updateUrl(filters);
     }
   }, [filters, updateUrl]);
@@ -95,41 +90,6 @@ export const useProducts = () => {
     }
   }, [productFiltersQuery.data, setAvailableFilters]);
 
-  useEffect(() => {
-    const formValues = convertParamsToForm(filters);
-    const currentValues = form.getValues();
-
-    const fieldsToCheck: (keyof ProductFiltersForm)[] = [
-      'search',
-      'orderBy',
-      'minPrice',
-      'maxPrice',
-      'brands',
-      'categories',
-      'condition',
-    ];
-
-    const hasChanged = fieldsToCheck.some((field) => {
-      const formValue = formValues[field];
-      const currentValue = currentValues[field];
-
-      if (Array.isArray(formValue) && Array.isArray(currentValue)) {
-        const changed =
-          formValue.length !== currentValue.length ||
-          !formValue.every((val, index) => val === currentValue[index]);
-
-        return changed;
-      }
-
-      const changed = formValue !== currentValue;
-      return changed;
-    });
-
-    if (hasChanged) {
-      form.reset(formValues);
-    }
-  }, [filters, form]);
-
   const handleSubmit = useCallback(
     (data: ProductFiltersForm) => {
       const apiFilters = convertFormToParams(data);
@@ -139,8 +99,23 @@ export const useProducts = () => {
   );
 
   const handleClear = useCallback(() => {
+    const defaultValues = convertParamsToForm({
+      pageNumber: 1,
+      pageSize: 12,
+      orderBy: undefined,
+      search: undefined,
+      brands: undefined,
+      categories: undefined,
+      condition: undefined,
+      minPrice: undefined,
+      maxPrice: undefined,
+    });
+
+    defaultValues.condition = 0;
+
+    form.reset(defaultValues);
     clearFilters();
-  }, [clearFilters]);
+  }, [clearFilters, form]);
 
   const handleSearchSubmit = useCallback(() => {
     const currentData = form.getValues();
