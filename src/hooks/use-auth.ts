@@ -3,7 +3,7 @@ import { signIn, signOut } from 'next-auth/react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import type { LoginRequest } from '@/models';
+import { LoginRequest } from '@/models';
 
 export const useLogin = () => {
   const router = useRouter();
